@@ -5,6 +5,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+
+import org.codehaus.jettison.json.JSONObject;
 //Path: http://localhost/<appln-folder-name>/login
 @Path("/login")
 public class Login {
@@ -18,7 +20,15 @@ public class Login {
     public String doLogin(@QueryParam("username") String uname, @QueryParam("password") String pwd){
         String response = "";
         if(checkCredentials(uname, pwd)){
-            response = Utility.constructJSON("login",true);
+        	JSONObject obj = Utility.createJSON("login",true);
+        	UserData userData = getUserData(uname);
+        	Utility.addToJSON(obj, "login", userData.login);
+        	Utility.addToJSON(obj, "password", userData.password);
+        	if(Utility.isNotNull(userData.name))
+        	{
+        		Utility.addToJSON(obj, "name", userData.name);
+        	}
+        	response = obj.toString();
         }else{
             response = Utility.constructJSON("login", false, "Incorrect Email or Password");
         }
@@ -49,6 +59,18 @@ public class Login {
             result = false;
         }
  
+        return result;
+    }
+    
+    private UserData getUserData(String login){
+    	UserData result = null;
+        if(Utility.isNotNull(login)){
+            try {
+                result = DBConnection.getUserData(login);
+            } catch (Exception e) {
+            }
+        }
+        
         return result;
     }
  

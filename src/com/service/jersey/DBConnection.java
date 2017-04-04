@@ -114,4 +114,38 @@ public class DBConnection {
         }
         return insertStatus;
     }
+    
+    public static UserData getUserData(String login) throws Exception {
+    	UserData result = null;
+        Connection dbConn = null;
+        try {
+            try {
+                dbConn = DBConnection.createConnection();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Statement stmt = dbConn.createStatement();
+            String query = "SELECT name, username, password FROM user WHERE username = '" + login
+                    + "'";
+            ResultSet rs = stmt.executeQuery(query);
+            if (rs.next()) {
+            	result = new UserData();
+                result.name = rs.getString(1);
+                result.login = rs.getString(2);
+                result.password = rs.getString(3);
+            }
+        } catch (SQLException sqle) {
+            throw sqle;
+        } catch (Exception e) {
+            if (dbConn != null) {
+                dbConn.close();
+            }
+            throw e;
+        } finally {
+            if (dbConn != null) {
+                dbConn.close();
+            }
+        }
+        return result;
+    }
 }

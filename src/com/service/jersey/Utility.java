@@ -52,5 +52,27 @@ public class Utility {
         }
         return obj.toString();
     }
- 
+    
+    public static JSONObject createJSON(String tag, boolean status) {
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("tag", tag);
+            obj.put("status", new Boolean(status));
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+        }
+        return obj;
+    }
+    
+    public static JSONObject addToJSON(JSONObject obj, String key, String value) {
+        try {
+        	if(Utility.isNotNull(key) && Utility.isNotNull(value))
+        	{
+        		obj.put(key, value);
+        	}
+        } catch (JSONException e) {
+        }
+        return obj;
+    }
+    
 }
