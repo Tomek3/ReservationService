@@ -5,6 +5,10 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.service.dao.*;
  
 public class DBConnection {
     /**
@@ -133,6 +137,45 @@ public class DBConnection {
                 result.name = rs.getString(1);
                 result.login = rs.getString(2);
                 result.password = rs.getString(3);
+            }
+        } catch (SQLException sqle) {
+            throw sqle;
+        } catch (Exception e) {
+            if (dbConn != null) {
+                dbConn.close();
+            }
+            throw e;
+        } finally {
+            if (dbConn != null) {
+                dbConn.close();
+            }
+        }
+        return result;
+    }
+    
+    public static List<ReservationObject> getAllReservationObject() throws Exception {
+    	List<ReservationObject> result = new ArrayList<ReservationObject>();
+        Connection dbConn = null;
+        try {
+            try {
+                dbConn = DBConnection.createConnection();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Statement stmt = dbConn.createStatement();
+            String query = "SELECT id, name, address, info, active FROM reservation_object";
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+            	ReservationObject ro = new ReservationObject();
+            	
+            	ro.setId(rs.getInt(1));
+            	ro.setName(rs.getString(2));
+            	ro.setAddress(rs.getString(3));
+            	ro.setInfo(rs.getString(4));
+            	ro.setActive(rs.getBoolean(5));
+            	
+            	result.add(ro);
+
             }
         } catch (SQLException sqle) {
             throw sqle;
