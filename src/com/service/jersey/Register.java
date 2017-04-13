@@ -39,6 +39,12 @@ public class Register {
         int result = 3;
         if(Utility.isNotNull(uname) && Utility.isNotNull(pwd)){
             try {
+            	if(DBConnection.getUserData(uname) != null)
+            	{
+            		//login already exist
+            		return 1;
+            	}
+            	
                 if(DBConnection.insertUser(name, uname, pwd)){
                     System.out.println("RegisterUSer if");
                     result = 0;
