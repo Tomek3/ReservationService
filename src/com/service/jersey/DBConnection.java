@@ -192,4 +192,44 @@ public class DBConnection {
         }
         return result;
     }
+    
+    public static List<ReservationObjectItem> getReservationObjectItem(String objectId, String date) throws Exception {
+    	List<ReservationObjectItem> result = new ArrayList<ReservationObjectItem>();
+        Connection dbConn = null;
+        try {
+            try {
+                dbConn = DBConnection.createConnection();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Statement stmt = dbConn.createStatement();
+            String query = "SELECT id, reservation_object_id, date_from, date_to, available FROM reservation_object_item "
+            		+ " where reservation_object_id = '" + objectId +"' and DATE(date_from) >= '" + date + "' and DATE(date_to) <= '" + date + "'";
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+            	ReservationObjectItem roi = new ReservationObjectItem();
+            	
+            	roi.setId(rs.getInt(1));
+            	roi.setReservation_object_id(rs.getInt(2));
+            	roi.setDateFrom(rs.getString(3));
+            	roi.setDateTo(rs.getString(4));
+            	roi.setAvailable(rs.getBoolean(5));
+            	
+            	result.add(roi);
+
+            }
+        } catch (SQLException sqle) {
+            throw sqle;
+        } catch (Exception e) {
+            if (dbConn != null) {
+                dbConn.close();
+            }
+            throw e;
+        } finally {
+            if (dbConn != null) {
+                dbConn.close();
+            }
+        }
+        return result;
+    }
 }
