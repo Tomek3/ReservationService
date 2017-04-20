@@ -129,7 +129,7 @@ public class DBConnection {
                 e.printStackTrace();
             }
             Statement stmt = dbConn.createStatement();
-            String query = "SELECT name, username, password FROM user WHERE username = '" + login
+            String query = "SELECT name, username, password, id FROM user WHERE username = '" + login
                     + "'";
             ResultSet rs = stmt.executeQuery(query);
             if (rs.next()) {
@@ -137,6 +137,7 @@ public class DBConnection {
                 result.name = rs.getString(1);
                 result.login = rs.getString(2);
                 result.password = rs.getString(3);
+                result.id = rs.getInt(4);
             }
         } catch (SQLException sqle) {
             throw sqle;

@@ -28,6 +28,7 @@ public class Login {
         	{
         		Utility.addToJSON(obj, "name", userData.name);
         	}
+        	Utility.addToJSON(obj, "id", userData.id.toString());
         	response = obj.toString();
         }else{
             response = Utility.constructJSON("login", false, "Incorrect Email or Password");
