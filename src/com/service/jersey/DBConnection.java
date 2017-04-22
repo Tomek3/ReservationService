@@ -232,4 +232,99 @@ public class DBConnection {
         }
         return result;
     }
+    
+    public static boolean isReservationObjectItemAvailable(String reservationObjectItemId) throws Exception {
+    	boolean available = true;
+        Connection dbConn = null;
+        try {
+            try {
+                dbConn = DBConnection.createConnection();
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            Statement stmt = dbConn.createStatement();
+            String query = "SELECT id FROM reservation WHERE reservation_object_item_id = '" + reservationObjectItemId
+                    + "' AND deleted is null";
+            ResultSet rs = stmt.executeQuery(query);
+            if (rs.next()) {
+            	available = false;
+            }
+        } catch (SQLException sqle) {
+            throw sqle;
+        } catch (Exception e) {
+            if (dbConn != null) {
+                dbConn.close();
+            }
+            throw e;
+        } finally {
+            if (dbConn != null) {
+                dbConn.close();
+            }
+        }
+        return available;
+    }
+    
+    public static boolean insertReservation(String userId, String resId) throws SQLException, Exception {
+        boolean insertStatus = false;
+        Connection dbConn = null;
+        try {
+            try {
+                dbConn = DBConnection.createConnection();
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            Statement stmt = dbConn.createStatement();
+            String query = "INSERT into reservation(reservation_object_item_id, user_id) values('"+resId+ "',"+"'"
+                    + userId + "')";
+            int records = stmt.executeUpdate(query);
+            if (records > 0) {
+                insertStatus = true;
+            }
+        } catch (SQLException sqle) {
+            throw sqle;
+        } catch (Exception e) {
+            if (dbConn != null) {
+                dbConn.close();
+            }
+            throw e;
+        } finally {
+            if (dbConn != null) {
+                dbConn.close();
+            }
+        }
+        return insertStatus;
+    }
+    
+    public static boolean setReservationObjectItemAvailable(String resId, int status) throws SQLException, Exception {
+        boolean insertStatus = false;
+        Connection dbConn = null;
+        try {
+            try {
+                dbConn = DBConnection.createConnection();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Statement stmt = dbConn.createStatement();
+            String query = "UPDATE reservation_object_item set available = '"+status+ "' where id ='"
+                    + resId + "'";
+            int records = stmt.executeUpdate(query);
+            if (records > 0) {
+                insertStatus = true;
+            }
+        } catch (SQLException sqle) {
+            throw sqle;
+        } catch (Exception e) {
+            if (dbConn != null) {
+                dbConn.close();
+            }
+            throw e;
+        } finally {
+            if (dbConn != null) {
+                dbConn.close();
+            }
+        }
+        return insertStatus;
+    }
 }
