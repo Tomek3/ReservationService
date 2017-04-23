@@ -1,6 +1,5 @@
 package com.service.jersey;
 
-
 import java.sql.SQLException;
 
 import javax.ws.rs.GET;
@@ -9,17 +8,16 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-
-@Path("/reservation")
-public class Reservation {
+@Path("/watch")
+public class ObjectWatched {
 	
 	@GET
 	@Path("/create")
 	@Produces(MediaType.APPLICATION_JSON) 
-	public String createReservation(@QueryParam("userId") String userId, @QueryParam("resId") String resId) {
+	public String createWatch(@QueryParam("userId") String userId, @QueryParam("resId") String resId) {
 
 		String response = "";
-        int retCode = insertReservation(userId, resId);
+        int retCode = insertWatch(userId, resId);
         if(retCode == 0){
             response = Utility.constructJSON("create",true);
         }else if(retCode == 1){
@@ -31,19 +29,18 @@ public class Reservation {
 
 	}
 	
-	private int insertReservation(String userId, String resId){
+	private int insertWatch(String userId, String resId){
         int result = 2;
         if(Utility.isNotNull(userId) && Utility.isNotNull(resId)){
             try {
-            	if(!DBConnection.isReservationObjectItemAvailable(resId))
+            	if(!DBConnection.isWatchObjectItemAvailable(resId))
             	{
-            		//reservation already exist
+            		//watch already exist
             		return 1;
             	}
             	
-                if(DBConnection.insertReservation(userId, resId)){
+                if(DBConnection.insertWatched(userId, resId)){
                     result = 0;
-                    DBConnection.setReservationObjectItemAvailable(resId, 0);
                 }
             } catch(SQLException sqle){
                 if(sqle.getErrorCode() == 1062){

@@ -327,4 +327,69 @@ public class DBConnection {
         }
         return insertStatus;
     }
+    
+    
+    //object watched
+    public static boolean isWatchObjectItemAvailable(String reservationObjectItemId) throws Exception {
+    	boolean available = true;
+        Connection dbConn = null;
+        try {
+            try {
+                dbConn = DBConnection.createConnection();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Statement stmt = dbConn.createStatement();
+            String query = "SELECT id FROM object_watched WHERE reservation_object_item_id = '" + reservationObjectItemId
+                    + "' AND deleted is null";
+            ResultSet rs = stmt.executeQuery(query);
+            if (rs.next()) {
+            	available = false;
+            }
+        } catch (SQLException sqle) {
+            throw sqle;
+        } catch (Exception e) {
+            if (dbConn != null) {
+                dbConn.close();
+            }
+            throw e;
+        } finally {
+            if (dbConn != null) {
+                dbConn.close();
+            }
+        }
+        return available;
+    }
+    
+    public static boolean insertWatched(String userId, String resId) throws SQLException, Exception {
+        boolean insertStatus = false;
+        Connection dbConn = null;
+        try {
+            try {
+                dbConn = DBConnection.createConnection();
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            Statement stmt = dbConn.createStatement();
+            String query = "INSERT into object_watched(reservation_object_item_id, user_id) values('"+resId+ "',"+"'"
+                    + userId + "')";
+            int records = stmt.executeUpdate(query);
+            if (records > 0) {
+                insertStatus = true;
+            }
+        } catch (SQLException sqle) {
+            throw sqle;
+        } catch (Exception e) {
+            if (dbConn != null) {
+                dbConn.close();
+            }
+            throw e;
+        } finally {
+            if (dbConn != null) {
+                dbConn.close();
+            }
+        }
+        return insertStatus;
+    }
 }
