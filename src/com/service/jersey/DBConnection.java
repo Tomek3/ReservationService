@@ -330,7 +330,7 @@ public class DBConnection {
     
     
     //object watched
-    public static boolean isWatchObjectItemAvailable(String reservationObjectItemId) throws Exception {
+    public static boolean isWatchObjectItemAvailable(String userId, String reservationObjectItemId) throws Exception {
     	boolean available = true;
         Connection dbConn = null;
         try {
@@ -341,7 +341,7 @@ public class DBConnection {
             }
             Statement stmt = dbConn.createStatement();
             String query = "SELECT id FROM object_watched WHERE reservation_object_item_id = '" + reservationObjectItemId
-                    + "' AND deleted is null";
+                    + "' and user_id = '" + userId + "' AND deleted is null";
             ResultSet rs = stmt.executeQuery(query);
             if (rs.next()) {
             	available = false;
@@ -391,5 +391,52 @@ public class DBConnection {
             }
         }
         return insertStatus;
+    }
+    
+    //reservation
+    public static List<Reservation> getAllUserReservation(String userId) throws Exception {
+    	List<Reservation> result = new ArrayList<Reservation>();
+        Connection dbConn = null;
+        try {
+            try {
+                dbConn = DBConnection.createConnection();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Statement stmt = dbConn.createStatement();
+            String query = "SELECT RES.id, ROI.id, RES.user_id, ROI.date_from, ROI.date_to, OBJ.name, OBJ.address, OBJ.info " +
+            			   "FROM reservation RES " +
+            			   "INNER JOIN reservation_object_item ROI on ROI.id = RES.reservation_object_item_id " +
+            			   "INNER JOIN reservation_object OBJ on OBJ.id = ROI.reservation_object_id " +
+            		       "WHERE RES.user_id = '" + userId +"' and deleted is null";
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+            	Reservation res = new Reservation();
+            	
+            	res.setId(rs.getInt(1));
+            	res.setReservationObjectId(rs.getInt(2));
+            	res.setUserId(rs.getInt(3));
+            	res.setDateFrom(rs.getString(4));
+            	res.setDateTo(rs.getString(5));
+            	res.setReservationObjectName(rs.getString(6));
+            	res.setReservationObjectAddress(rs.getString(7));
+            	res.setReservationObjectInfo(rs.getString(8));
+            	
+            	result.add(res);
+
+            }
+        } catch (SQLException sqle) {
+            throw sqle;
+        } catch (Exception e) {
+            if (dbConn != null) {
+                dbConn.close();
+            }
+            throw e;
+        } finally {
+            if (dbConn != null) {
+                dbConn.close();
+            }
+        }
+        return result;
     }
 }

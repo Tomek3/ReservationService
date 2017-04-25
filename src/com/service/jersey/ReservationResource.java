@@ -9,9 +9,15 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import com.google.gson.Gson;
+import com.service.dao.ReservationDAO;
+import com.service.dao.ReservationObjectItemDAO;
+
 
 @Path("/reservation")
-public class Reservation {
+public class ReservationResource {
+	
+	ReservationDAO dao = new ReservationDAO();
 	
 	@GET
 	@Path("/create")
@@ -29,6 +35,14 @@ public class Reservation {
 	    }
         return response;
 
+	}
+	
+	@GET
+	@Path("/byUser") 
+	@Produces(MediaType.APPLICATION_JSON+ ";charset=utf-8") 
+	public String getAllUserReservation(@QueryParam("userId") String userId) 
+	{
+	    return new Gson().toJson(dao.getAllUserReservation(userId));
 	}
 	
 	private int insertReservation(String userId, String resId){

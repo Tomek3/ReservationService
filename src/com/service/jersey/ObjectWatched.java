@@ -33,7 +33,7 @@ public class ObjectWatched {
         int result = 2;
         if(Utility.isNotNull(userId) && Utility.isNotNull(resId)){
             try {
-            	if(!DBConnection.isWatchObjectItemAvailable(resId))
+            	if(!DBConnection.isWatchObjectItemAvailable(userId, resId))
             	{
             		//watch already exist
             		return 1;
