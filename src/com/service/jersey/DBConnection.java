@@ -250,6 +250,13 @@ public class DBConnection {
             if (rs.next()) {
             	available = false;
             }
+            
+            query = "SELECT id FROM reservation_object_item WHERE id = '" + reservationObjectItemId
+                    + "' AND available=1 AND date_from < now()";
+            rs = stmt.executeQuery(query);
+            if (rs.next()) {
+            	available = false;
+            }
         } catch (SQLException sqle) {
             throw sqle;
         } catch (Exception e) {
@@ -408,7 +415,8 @@ public class DBConnection {
             			   "FROM reservation RES " +
             			   "INNER JOIN reservation_object_item ROI on ROI.id = RES.reservation_object_item_id " +
             			   "INNER JOIN reservation_object OBJ on OBJ.id = ROI.reservation_object_id " +
-            		       "WHERE RES.user_id = '" + userId +"' and deleted is null";
+            		       "WHERE RES.user_id = '" + userId +"' and deleted is null " +
+            			   "ORDER BY ROI.date_from DESC";
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
             	Reservation res = new Reservation();
@@ -424,6 +432,101 @@ public class DBConnection {
             	
             	result.add(res);
 
+            }
+        } catch (SQLException sqle) {
+            throw sqle;
+        } catch (Exception e) {
+            if (dbConn != null) {
+                dbConn.close();
+            }
+            throw e;
+        } finally {
+            if (dbConn != null) {
+                dbConn.close();
+            }
+        }
+        return result;
+    }
+    
+    public static boolean canDeleteReservation(String resId) throws Exception {
+    	boolean available = false;
+        Connection dbConn = null;
+        try {
+            try {
+                dbConn = DBConnection.createConnection();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Statement stmt = dbConn.createStatement();
+            String query = "SELECT RES.id FROM reservation RES "
+            		+ "INNER JOIN reservation_object_item ROI on ROI.id = RES.reservation_object_item_id "
+            		+ "WHERE RES.id = '" + resId
+                    + "' AND RES.deleted is null AND DATE_ADD(ROI.date_from, INTERVAL -1 HOUR) > now()";
+            ResultSet rs = stmt.executeQuery(query);
+            if (rs.next()) {
+            	available = true;
+            }
+        } catch (SQLException sqle) {
+            throw sqle;
+        } catch (Exception e) {
+            if (dbConn != null) {
+                dbConn.close();
+            }
+            throw e;
+        } finally {
+            if (dbConn != null) {
+                dbConn.close();
+            }
+        }
+        return available;
+    }
+    
+    public static boolean deleteReservation(String resId) throws SQLException, Exception {
+        boolean insertStatus = false;
+        Connection dbConn = null;
+        try {
+            try {
+                dbConn = DBConnection.createConnection();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Statement stmt = dbConn.createStatement();
+            String query = "UPDATE reservation set deleted = 1 where id ='"
+                    + resId + "'";
+            int records = stmt.executeUpdate(query);
+            if (records > 0) {
+                insertStatus = true;
+            }
+        } catch (SQLException sqle) {
+            throw sqle;
+        } catch (Exception e) {
+            if (dbConn != null) {
+                dbConn.close();
+            }
+            throw e;
+        } finally {
+            if (dbConn != null) {
+                dbConn.close();
+            }
+        }
+        return insertStatus;
+    }
+    
+    public static String getReservationObjectItemId(String resId) throws Exception {
+    	String result = null;
+        Connection dbConn = null;
+        try {
+            try {
+                dbConn = DBConnection.createConnection();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Statement stmt = dbConn.createStatement();
+            String query = "SELECT reservation_object_item_id from Reservation where id = '" + resId
+                    + "'";
+            ResultSet rs = stmt.executeQuery(query);
+            if (rs.next()) {
+                result = rs.getString(1);
             }
         } catch (SQLException sqle) {
             throw sqle;
