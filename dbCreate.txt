@@ -1,0 +1,83 @@
+CREATE DATABASE `reservationservice` /*!40100 DEFAULT CHARACTER SET utf8 */;
+
+CREATE TABLE `user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(50) NOT NULL,
+  `register_dt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `reservation_object` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `info` varchar(255) DEFAULT NULL,
+  `create_dt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `active` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `reservation_object_item` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `reservation_object_id` int(11) NOT NULL,
+  `date_from` datetime NOT NULL,
+  `date_to` datetime NOT NULL,
+  `available` tinyint(4) DEFAULT NULL,
+  `create_dt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=654 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `reservation` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `reservation_object_item_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `deleted` tinyint(1) DEFAULT NULL,
+  `create_dt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `object_watched` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `reservation_object_item_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `deleted` tinyint(1) DEFAULT NULL,
+  `create_dt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `generateReservationDates`()
+BEGIN
+  DECLARE datefrom datetime;
+  DECLARE dateto datetime;
+  
+  set datefrom = '2017-04-18 08:00:00';
+  set dateto = '2017-05-31 16:00:00';
+  
+  WHILE datefrom < dateto DO
+    if hour(datefrom) >= 8 and hour(datefrom)<=22 then
+		INSERT INTO `reservationservice`.`reservation_object_item`
+		(
+		`reservation_object_id`,
+		`date_from`,
+		`date_to`,
+		`available`)
+		VALUES
+		(
+		1,
+		datefrom,
+		DATE_ADD(datefrom, INTERVAL 1 HOUR),
+		1);
+	end if;
+        
+    set datefrom =  DATE_ADD(datefrom, INTERVAL 1 HOUR);
+
+  END WHILE;
+
+END$$
+DELIMITER ;
+
+
+
