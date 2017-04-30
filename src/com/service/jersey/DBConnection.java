@@ -627,7 +627,7 @@ public class DBConnection {
 			"from object_watched OW "+
 			"inner join reservation_object_item ROI on ROI.id = OW.reservation_object_item_id and ROI.available = 1 "+
 			"left join notification N on N.user_id = OW.user_id and N.object_watch_id = OW.id "+
-			"where N.id is null and OW.deleted is null and OW.user_id = '" + userId +"' "+
+			"where N.id is null and OW.deleted is null and ROI.date_from > now() and OW.user_id = '" + userId +"' "+
 			"union all "+
 			"select RES.user_id, RES.id, null, null "+
 			"from reservation RES "+
