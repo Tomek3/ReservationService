@@ -47,6 +47,18 @@ CREATE TABLE `object_watched` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 
+CREATE TABLE `notification` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `reservation_id` int(11) DEFAULT NULL,
+  `object_watch_id` int(11) DEFAULT NULL,
+  `deleted` tinyint(1) DEFAULT NULL,
+  `send` tinyint(1) DEFAULT NULL,
+  `create_dt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8;
+
+
 DELIMITER $$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `generateReservationDates`()
 BEGIN
