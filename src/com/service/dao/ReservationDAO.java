@@ -15,5 +15,14 @@ public class ReservationDAO implements IReservationDAO {
 			return null;
 		}
 	}
+	
+	@Override
+	public List<Reservation> getAllUserObjectWatched(String userId){
+		try {
+			return DBConnection.getAllUserObjectWatched(userId);
+		} catch (Exception e) {
+			return null;
+		}
+	}
 
 }

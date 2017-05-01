@@ -56,11 +56,37 @@ public class ReservationResource {
 	}
 	
 	@GET
+	@Path("/watched/delete")
+	@Produces(MediaType.APPLICATION_JSON) 
+	public String removeObjectWatched(@QueryParam("userId") String userId, @QueryParam("resId") String watchedId) {
+
+		String response = "";
+        int retCode = deleteObjectWatched(userId, watchedId);
+        if(retCode == 0){
+            response = Utility.constructJSON("delete",true);
+        }else if(retCode == 1){
+            response = Utility.constructJSON("delete",false, "Object is not available");
+		}else if(retCode == 2){
+	        response = Utility.constructJSON("delete",false, "Error occured");
+	    }
+        return response;
+
+	}
+	
+	@GET
 	@Path("/byUser") 
 	@Produces(MediaType.APPLICATION_JSON+ ";charset=utf-8") 
 	public String getAllUserReservation(@QueryParam("userId") String userId) 
 	{
 	    return new Gson().toJson(dao.getAllUserReservation(userId));
+	}
+	
+	@GET
+	@Path("/watched/byUser") 
+	@Produces(MediaType.APPLICATION_JSON+ ";charset=utf-8") 
+	public String getAllUserObjectWatched(@QueryParam("userId") String userId) 
+	{
+	    return new Gson().toJson(dao.getAllUserObjectWatched(userId));
 	}
 	
 	private int insertReservation(String userId, String resId){
@@ -96,7 +122,6 @@ public class ReservationResource {
             try {
             	if(!DBConnection.canDeleteReservation(resId))
             	{
-            		//reservation already exist
             		return 1;
             	}
             	
@@ -109,6 +134,22 @@ public class ReservationResource {
                 if(sqle.getErrorCode() == 1062){
                     result = 1;
                 } 
+            }
+            catch (Exception e) {
+                result = 2;
+            }
+        }
+ 
+        return result;
+    }
+	
+	private int deleteObjectWatched(String userId, String watchedId){
+        int result = 2;
+        if(Utility.isNotNull(userId) && Utility.isNotNull(watchedId)){
+            try {	
+                if(DBConnection.deleteObjectWatched(watchedId)){
+                    result = 0;
+                }
             }
             catch (Exception e) {
                 result = 2;
